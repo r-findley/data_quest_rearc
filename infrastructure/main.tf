@@ -140,9 +140,9 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   source_arn    = aws_cloudwatch_event_rule.lambda_schedule.arn
 }
 
-resource "aws_iam_role_policy" "lambda_s3_put_object" {
+resource "aws_iam_role_policy" "lambda_s3_access" {
   provider = aws.sandbox
-  name     = "lambda_s3_put_object"
+  name     = "lambda_s3_access"
   role     = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
@@ -150,8 +150,16 @@ resource "aws_iam_role_policy" "lambda_s3_put_object" {
     Statement = [
       {
         Effect = "Allow",
-        Action = "s3:PutObject",
-        Resource = "${aws_s3_bucket.s3_bucket.arn}/*"
+        Action = [
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:HeadObject"
+        ],
+        Resource = [
+          "${aws_s3_bucket.s3_bucket.arn}",
+          "${aws_s3_bucket.s3_bucket.arn}/*"
+        ]
       }
     ]
   })
