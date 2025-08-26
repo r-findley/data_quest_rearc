@@ -22,7 +22,7 @@ module "management_group" {
   sandbox_account_id = "856558477169"
 }
 
-resource "aws_s3_bucket" "this" {
+resource "aws_s3_bucket" "s3_bucket" {
   provider = aws.sandbox
   bucket   = "rearc-test-bucket-${random_id.suffix.hex}"
 
@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "this" {
   }
 }
 
-resource "aws_sqs_queue" "this" {
+resource "aws_sqs_queue" "sqs_queue" {
   provider                  = aws.sandbox
   name                      = "rearc-sqs-queue-${random_id.suffix.hex}"
   delay_seconds             = 90
@@ -56,4 +56,111 @@ resource "aws_sqs_queue" "terraform_queue_deadletter" {
 
 resource "random_id" "suffix" {
   byte_length = 4
+}
+
+data "archive_file" "lambda_one_payload" {
+  type       = "zip"
+  source_dir = var.lambda_one_src_dir
+  excludes = [
+    "venv",
+    "__pycache__"
+  ]
+  output_path = "${var.lambda_one_src_dir}/payload.zip"
+}
+
+resource "aws_iam_role" "lambda_exec" {
+  provider = aws.sandbox
+  name     = "lambda_exec_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+  resource "aws_iam_role_policy_attachment" "lambda_exec_basic" {
+    provider   = aws.sandbox
+    role       = aws_iam_role.lambda_exec.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  }
+
+  resource "aws_lambda_layer_version" "lambda_one_dependencies" {
+    provider            = aws.sandbox
+    filename            = "${path.module}/../layer.zip"
+    layer_name          = "lambda_one_dependencies"
+    compatible_runtimes = ["python3.12"]
+    description         = "Dependencies for lambda_one"
+  }
+
+resource "aws_lambda_function" "lambda_one" {
+  provider      = aws.sandbox
+  function_name = "lambda_one"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "lambda_function.lambda_one_handler"
+  runtime       = "python3.12"
+  timeout       = 60
+
+  filename         = data.archive_file.lambda_one_payload.output_path
+  source_code_hash = data.archive_file.lambda_one_payload.output_base64sha256
+
+    layers = [aws_lambda_layer_version.lambda_one_dependencies.arn]
+
+  environment {
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.s3_bucket.id
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "lambda_schedule" {
+  provider            = aws.sandbox
+  name                = "lambda_one_schedule"
+  description         = "Run Lambda every day at 12 PM PST"
+  schedule_expression = "cron(30 20 * * ? *)"
+}
+
+resource "aws_cloudwatch_event_target" "lambda_target" {
+  provider  = aws.sandbox
+  rule      = aws_cloudwatch_event_rule.lambda_schedule.name
+  target_id = "lambda_one_target"
+  arn       = aws_lambda_function.lambda_one.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  provider      = aws.sandbox
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_one.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.lambda_schedule.arn
+}
+
+resource "aws_iam_role_policy" "lambda_s3_access" {
+  provider = aws.sandbox
+  name     = "lambda_s3_access"
+  role     = aws_iam_role.lambda_exec.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:HeadObject"
+        ],
+        Resource = [
+          "${aws_s3_bucket.s3_bucket.arn}",
+          "${aws_s3_bucket.s3_bucket.arn}/*"
+        ]
+      }
+    ]
+  })
 }

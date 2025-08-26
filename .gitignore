@@ -131,7 +131,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+lambda_one/lambda_one
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -231,3 +231,4 @@ AWSCLIV2.pkg
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,terraform
 
+/layer
