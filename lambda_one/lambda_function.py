@@ -11,6 +11,7 @@ from helpers import (
     list_s3_objects_with_metadata,
     sync_s3_with_bls_metadata,
     upload_object_to_s3,
+    write_message_to_sqs,
 )
 
 logger = logging.getLogger()
@@ -86,6 +87,12 @@ def lambda_one_handler(event, context):
                     "source": "datausa",
                     "description": "Population data from Data USA",
                 },
+            )
+            queue_url = os.environ["SQS_QUEUE_URL"]
+            if not queue_url:
+                raise ValueError("SQS_QUEUE_URL environment variable is not set.")
+            write_message_to_sqs(
+                queue_url=queue_url, message_body="Data USA population data uploaded"
             )
     except Exception as e:
         logger.error(f"Unable to load Data USA object to bucket - {e}", exc_info=True)

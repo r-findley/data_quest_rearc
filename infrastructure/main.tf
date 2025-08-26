@@ -54,6 +54,29 @@ resource "aws_sqs_queue" "terraform_queue_deadletter" {
   name     = "rearc-deadletter-${random_id.suffix.hex}"
 }
 
+data "aws_iam_policy_document" "send_message" {
+  provider = aws.sandbox
+  statement {
+    sid    = "First"
+    effect = "Allow"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions   = ["sqs:SendMessage"]
+    resources = [aws_sqs_queue.sqs_queue.arn]
+
+  }
+}
+
+resource "aws_sqs_queue_policy" "send_message_policy" {
+  provider  = aws.sandbox
+  queue_url = aws_sqs_queue.sqs_queue.id
+  policy    = data.aws_iam_policy_document.send_message.json
+}
+
 resource "random_id" "suffix" {
   byte_length = 4
 }
@@ -113,6 +136,7 @@ resource "aws_lambda_function" "lambda_one" {
   environment {
     variables = {
       BUCKET_NAME = aws_s3_bucket.s3_bucket.id
+      SQS_QUEUE_URL = aws_sqs_queue.sqs_queue.id
     }
   }
 }

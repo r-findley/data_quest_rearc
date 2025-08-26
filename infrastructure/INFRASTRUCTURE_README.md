@@ -29,7 +29,7 @@ Lambda functions are being used to handle the gathering of data as well as proce
 
 ### Permissions/Policies
 
-Permissions and policies were added to handle access to the functions and buckets.
+Permissions and policies were added to handle access to the functions, queues, and buckets.
 
 ### Random IDs
 

@@ -4,9 +4,11 @@
 
 Part two of the challenge gets data from the DataUSA datasets and writes this to an s3 bucket under the prefix datausa/.
 
+The work to write an SQS message to a queue for triggering the 2nd lambda function has been included in this part as well.
+
 ## Process
 
-This work is performed with a simple GET request to obtain the data.
+This work is performed with a simple GET request to obtain the data. A function was written to write messages to the SQS queue that was created with the Terraform files.
 
 ## Next Steps
 
