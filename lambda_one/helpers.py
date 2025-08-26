@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 import boto3
-import requests
+import os
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger()
@@ -309,3 +309,27 @@ def sync_s3_with_bls_metadata(
             logger.info(f"Marking new file {bls_key} for upload to S3")
             files_to_upload.append(bls_key)
     return files_to_upload
+
+
+def write_message_to_sqs(queue_url: str, message_body: str) -> None:
+    """
+    Sends a message to an SQS queue.
+
+    Args:
+        queue_url (str): URL of the SQS queue.
+        message_body (str): The message body to send.
+
+    Returns:
+        None
+
+    Example:
+        >>> write_message_to_sqs('https://sqs.us-east-1.amazonaws.com/123456789012/my-queue', 'Hello, World!')
+    """
+    try:
+        sqs_client = boto3.client("sqs")
+        resp = sqs_client.send_message(QueueUrl=queue_url, MessageBody=message_body)
+        logger.info(f"Message sent to SQS with MessageId: {resp.get('MessageId')}")
+        return resp.get("MessageId")
+    except Exception as e:
+        logger.error(f"Failed to send message to SQS: {str(e)}")
+        raise
