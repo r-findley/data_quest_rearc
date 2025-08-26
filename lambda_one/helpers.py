@@ -1,9 +1,11 @@
-from datetime import datetime
-from bs4 import BeautifulSoup
 import hashlib
 import logging
-import boto3
 import re
+from datetime import datetime
+
+import boto3
+import requests
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -177,7 +179,7 @@ def get_link_stub(text: str) -> str | None:
         logger.error(f"Unable to get link stub - {e}", exc_info=True)
 
 
-def upload_object_to_s3(bucket_name, key, object_content, metadata):
+def upload_object_to_s3(bucket_name: str, key: str, object_content, metadata):
     """
     Uploads an object to an S3 bucket with metadata.
 
@@ -196,14 +198,17 @@ def upload_object_to_s3(bucket_name, key, object_content, metadata):
     try:
         s3_client = boto3.client("s3")
         s3_client.put_object(
-            Bucket=bucket_name, Key=key, Body=object_content, Metadata=metadata
+            Bucket=bucket_name,
+            Key=key,
+            Body=object_content,
+            Metadata=metadata,
         )
     except Exception as e:
         logger.error(f"Failed to upload object to S3: {str(e)}")
         raise
 
 
-def list_s3_objects_with_metadata(bucket_name):
+def list_s3_objects_with_metadata(bucket_name: str, prefix: str = "") -> list[dict]:
     """
     Lists all objects in an S3 bucket along with their metadata.
 
@@ -220,7 +225,7 @@ def list_s3_objects_with_metadata(bucket_name):
     try:
         s3_client = boto3.client("s3")
         paginator = s3_client.get_paginator("list_objects_v2")
-        page_iterator = paginator.paginate(Bucket=bucket_name)
+        page_iterator = paginator.paginate(Bucket=bucket_name, Prefix=prefix)
 
         objects_with_metadata = []
         for page in page_iterator:
@@ -250,6 +255,7 @@ def sync_s3_with_bls_metadata(
     """
     Synchronizes S3 bucket contents with BLS.gov metadata.
     Deletes objects not present in BLS.gov, and returns a list of files that need upload (new or updated).
+    Uses 'bls_data/{file_name}' as the S3 key for all BLS.gov files.
 
     Args:
         s3_client (boto3.client): Boto3 S3 client.
@@ -258,15 +264,15 @@ def sync_s3_with_bls_metadata(
         s3_objects (list): List of S3 object dicts.
 
     Returns:
-        list: List of file names that need to be uploaded to S3.
+        list: List of S3 keys that need to be uploaded to S3.
 
     Example:
         >>> sync_s3_with_bls_metadata(s3_client, 'my-bucket', bls_metadata, s3_objects)
-        ['file1.txt', 'file2.txt']
+        ['bls_data/file1.txt', 'bls_data/file2.txt']
     """
     files_to_upload = []
     try:
-        bls_files = {item["file_name"]: item for item in bls_metadata}
+        bls_files = {f"bls_data/{item['file_name']}": item for item in bls_metadata}
         s3_files = {
             obj["Key"]: {
                 "file_size": int(obj["Metadata"].get("file_size", obj["Size"])),
@@ -283,23 +289,23 @@ def sync_s3_with_bls_metadata(
             logger.info(f"Deleting {s3_file} from S3 (not found in BLS metadata)")
             s3_client.delete_object(Bucket=bucket_name, Key=s3_file)
 
-    for bls_file, bls_info in bls_files.items():
-        s3_info = s3_files.get(bls_file)
+    for bls_key, bls_info in bls_files.items():
+        s3_info = s3_files.get(bls_key)
         bls_size = int(bls_info["file_size"])
         bls_modified = str(bls_info.get("source_last_modified"))
         if s3_info:
             s3_size = s3_info["file_size"]
             s3_modified = str(s3_info.get("source_last_modified"))
             logger.info(
-                f"Comparing for {bls_file}: BLS size={bls_size}, S3 size={s3_size}, BLS modified={bls_modified}, S3 modified={s3_modified}"
+                f"Comparing for {bls_key}: BLS size={bls_size}, S3 size={s3_size}, BLS modified={bls_modified}, S3 modified={s3_modified}"
             )
             if bls_size != s3_size or bls_modified != s3_modified:
                 logger.info(
-                    f"Marking {bls_file} for upload (size or last_modified changed)"
+                    f"Marking {bls_key} for upload (size or last_modified changed)"
                 )
-                s3_client.delete_object(Bucket=bucket_name, Key=bls_file)
-                files_to_upload.append(bls_file)
+                s3_client.delete_object(Bucket=bucket_name, Key=bls_key)
+                files_to_upload.append(bls_key)
         else:
-            logger.info(f"Marking new file {bls_file} for upload to S3")
-            files_to_upload.append(bls_file)
+            logger.info(f"Marking new file {bls_key} for upload to S3")
+            files_to_upload.append(bls_key)
     return files_to_upload

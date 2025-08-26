@@ -154,7 +154,8 @@ resource "aws_iam_role_policy" "lambda_s3_access" {
           "s3:PutObject",
           "s3:ListBucket",
           "s3:GetObject",
-          "s3:HeadObject"
+          "s3:HeadObject",
+          "s3:DeleteObject"
         ],
         Resource = [
           "${aws_s3_bucket.s3_bucket.arn}",
