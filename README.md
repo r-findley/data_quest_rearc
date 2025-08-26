@@ -19,10 +19,10 @@ The primary technologies for this project will by Python, Terraform, and AWS.
 
 Additional information can be found about the various components of the project by referencing the README documentation for those areas.
 
-1. insert link for part 1
+1. [Part One - Data from BLS Site](./lambda_one/PART_ONE.md)
 2. insert link for part 2
 3. insert link for part 3
-4. [Infrastructure](./infrastructure/INFRASTRUCTURE_README.md)
+4. [Part Four - Infrastructure](./infrastructure/INFRASTRUCTURE_README.md)
 
 ## Disclaimer
 

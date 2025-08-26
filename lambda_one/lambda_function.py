@@ -38,8 +38,9 @@ def lambda_one_handler(event, context):
     except Exception as e:
         logger.error(f"Unable to retrieve and process data - {e}", exc_info=True)
 
+    files_to_upload = []
     try:
-        sync_s3_with_bls_metadata(
+        files_to_upload = sync_s3_with_bls_metadata(
             s3_client=s3_client,
             bucket_name=bucket_name,
             bls_metadata=metadata,
@@ -51,14 +52,7 @@ def lambda_one_handler(event, context):
     try:
         for item in metadata:
             key = item["file_name"]
-            s3_obj = next((obj for obj in objects_in_bucket if obj["Key"] == key), None)
-            needs_upload = (
-                s3_obj is None
-                or item["file_size"] != s3_obj["Size"]
-                or item.get("source_last_modified")
-                != s3_obj.get("source_last_modified")
-            )
-            if needs_upload:
+            if key in files_to_upload:
                 link_stub = get_link_stub(item["link"])
                 object_content = requests.get(
                     f"{base_url}{link_stub}", timeout=5, headers=headers
