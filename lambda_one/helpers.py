@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 import boto3
-import os
+
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger()

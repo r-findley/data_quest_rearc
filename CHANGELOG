@@ -1,0 +1,62 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.0.5]
+
+### Updated
+
+- [README](/README.md) to include detailed outline of project
+
+### Removed
+
+- INFRASTRUCTURE.md, PART_ONE.md, PART_TWO.md - these were consolidated
+ into the README.md file
+
+## [0.0.4]
+
+### Added
+
+- Function to write messages to SQS queue
+- Permissions for writing to SQS queue from lambda function
+
+## [0.0.3]
+
+### Added
+
+- Functionality to pull data from datausa to store as a JSON file in s3 bucket
+
+### Updated
+
+- Ability to include prefix when loading files to s3
+- Role policy for s3 bucket access from lambda function
+
+## [0.0.2]
+
+### Added
+
+- Added lambda_one directory with helpers to identify and mark metadata for
+ bls.gov data
+- Lambda function added to Terraform configuration to include layers for requirements,
+ creation of zip file, roles and policies to deploy and utilize function, cloudwatch
+  event to trigger function
+
+## [0.0.1]
+
+### Added
+
+- Initial Terraform structure and build for deployment of resources. This includes:
+
+  - s3 bucket
+  - sqs queue
+  - dead letter queue
+  - management role module
+  - sandbox role module
+
+[0.0.4]: https://github.com/r-findley/data_quest_rearc/pull/9
+[0.0.3]: https://github.com/r-findley/data_quest_rearc/pull/8
+[0.0.2]: https://github.com/r-findley/data_quest_rearc/pull/7
+[0.0.1]: https://github.com/r-findley/data_quest_rearc/pull/2
