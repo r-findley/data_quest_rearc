@@ -1,8 +1,8 @@
 #!/bin/bash
 
 set -e
-LAYER_DIR="layer/python"
-ZIP_FILE="layer.zip"
+LAYER_DIR="layer/lambda_one_python"
+ZIP_FILE="layer_one.zip"
 REQUIREMENTS="lambda_one/requirements.txt"
 
 rm -rf layer $ZIP_FILE
