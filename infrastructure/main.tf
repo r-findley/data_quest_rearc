@@ -30,7 +30,26 @@ resource "aws_s3_bucket" "s3_bucket" {
     Name        = "rearc-data-quest"
     Environment = "Dev"
   }
+  }
+
+resource "aws_s3_bucket_policy" "allow_jupyter_user_read" {
+  provider = aws.sandbox
+  bucket = aws_s3_bucket.s3_bucket.id
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::542403648992:user/jupyter_user"
+        },
+        Action = ["s3:GetObject"],
+        Resource = "${aws_s3_bucket.s3_bucket.arn}/*"
+      }
+    ]
+  })
 }
+
 
 resource "aws_sqs_queue" "sqs_queue" {
   provider                  = aws.sandbox
