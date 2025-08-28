@@ -65,6 +65,13 @@ that performs the data analytics in
 
 ### Challenge Part Three - Data Analytics
 
+#### Jupyter Notebook Analysis
+
+The initial analysis was completed within a [Jupyter Notebook](/analytics.ipynb).
+The data was obtained from the s3 bucket and converted into dataframes for use
+in the analytics work. Tables were built as instructed to display the values
+requested.
+
 ### Challenge Part Four - Infrastructure as Code
 
 The last part of the challenge includes writing infrastructure as code
