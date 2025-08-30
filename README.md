@@ -72,6 +72,25 @@ The data was obtained from the s3 bucket and converted into dataframes for use
 in the analytics work. Tables were built as instructed to display the values
 requested.
 
+#### Lambda Function
+
+A Lambda function was built that performs the analytics work that occurred
+within the [Jupyter Notebook](/analytics.ipynb) file. This data is logged
+to CloudWatch using the built-in Python logger. The function is started
+by an SQS message sent by the lambda function from parts one and two.
+
+Please note the following instructions to properly build the pandas and
+numpy libraries:
+
+Within the lambda_two directory, the ```pip install -t . pandas``` command
+was run in order to install pandas directly into the directory for the
+lambda function. Then, whl packages were downloaded from pypi for both
+pandas and numpy for Python version 3.12 using the manylinux version of
+the whl files. The pandas, numpy, and *.dist-info directories were removed,
+and the whl files were unzipped. The whl files, __pycache__ and*.dist-info
+items were removed, and a zip.zip was created of the lambda_two directory.
+This zip is used in building the Lambda function.
+
 ### Challenge Part Four - Infrastructure as Code
 
 The last part of the challenge includes writing infrastructure as code

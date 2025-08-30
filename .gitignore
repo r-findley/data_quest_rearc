@@ -232,3 +232,17 @@ AWSCLIV2.pkg
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,terraform
 
 /layer
+shared_layer.zip
+
+lambda_two/bin
+lambda_two/dateutil
+lambda_two/numpy*
+lambda_two/pandas
+lambda_two/python_dateutil*
+lambda_two/pytz*
+lambda_two/six*
+lambda_two/tzdata*
+lambda_two/zip
+lambda_two/payload.zip
+
+.DS_Store

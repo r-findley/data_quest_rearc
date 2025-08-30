@@ -7,3 +7,7 @@ variable "region" {
 variable "lambda_one_src_dir" {
   default = "../lambda_one"
 }
+
+variable "lambda_two_src_dir" {
+  default = "../lambda_two"
+}

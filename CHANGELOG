@@ -5,14 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.6]
+## [0.7.0]
+
+### Added
+
+- AWS Lambda Function Two for handling the analytics work that is in the
+Jupyter Notebook.
+
+## [0.6.0]
 
 ### Added
 
 - [Jupyter Notebook](./analytics.ipynb) for analysis of data obtained
 in parts one and two.
 
-## [0.0.5]
+## [0.5.0]
 
 ### Updated
 
@@ -23,14 +30,14 @@ in parts one and two.
 - INFRASTRUCTURE.md, PART_ONE.md, PART_TWO.md - these were consolidated
  into the README.md file
 
-## [0.0.4]
+## [0.4.0]
 
 ### Added
 
 - Function to write messages to SQS queue
 - Permissions for writing to SQS queue from lambda function
 
-## [0.0.3]
+## [0.3.0]
 
 ### Added
 
@@ -41,7 +48,7 @@ in parts one and two.
 - Ability to include prefix when loading files to s3
 - Role policy for s3 bucket access from lambda function
 
-## [0.0.2]
+## [0.2.0]
 
 ### Added
 
@@ -51,7 +58,7 @@ in parts one and two.
  creation of zip file, roles and policies to deploy and utilize function, cloudwatch
   event to trigger function
 
-## [0.0.1]
+## [0.1.0]
 
 ### Added
 
@@ -63,8 +70,9 @@ in parts one and two.
   - management role module
   - sandbox role module
 
-[0.0.5]: https://github.com/r-findley/data_quest_rearc/pull/14
-[0.0.4]: https://github.com/r-findley/data_quest_rearc/pull/9
-[0.0.3]: https://github.com/r-findley/data_quest_rearc/pull/8
-[0.0.2]: https://github.com/r-findley/data_quest_rearc/pull/7
-[0.0.1]: https://github.com/r-findley/data_quest_rearc/pull/2
+[0.6.0]: https://github.com/r-findley/data_quest_rearc/pull/21
+[0.5.0]: https://github.com/r-findley/data_quest_rearc/pull/14
+[0.4.0]: https://github.com/r-findley/data_quest_rearc/pull/9
+[0.3.0]: https://github.com/r-findley/data_quest_rearc/pull/8
+[0.2.0]: https://github.com/r-findley/data_quest_rearc/pull/7
+[0.1.0]: https://github.com/r-findley/data_quest_rearc/pull/2
