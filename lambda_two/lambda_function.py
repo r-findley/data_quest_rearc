@@ -32,6 +32,7 @@ def lambda_two_handler(event, context):
         )
     except Exception as e:
         logger.error(f"Unable to retrieve files from S3 - {e}", exc_info=True)
+        return
 
     if bls_csv:
         logger.info(f"Type of bls_csv: {type(bls_csv)}")
@@ -67,7 +68,7 @@ def lambda_two_handler(event, context):
             best_years_idx, ["Series_id", "Year", "Value"]
         ]
         logger.info(
-            f"Best years for each series calculated, total records: {best_years_for_each_series=})"
+            f"Best years for each series calculated, total records: {best_years_for_each_series=}"
         )
     except Exception as e:
         logger.error(

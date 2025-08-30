@@ -35,4 +35,4 @@ def get_file_from_bucket(s3_client, bucket_name: str, key: str) -> object:
         return response["Body"].read().decode("utf-8")
     except Exception as e:
         print(f"Error retrieving file from bucket: {e}")
-        return b""
+        return ""
