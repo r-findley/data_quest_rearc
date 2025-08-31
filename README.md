@@ -48,6 +48,11 @@ to begin uploading the data from the bls.gov website. If a file no longer exists
 on the bls.gov website, the function will remove the file and not suggest it needs
 to be uploaded again.
 
+Upon reading of the objects in the s3 bucket, a set of pre-signed URLs is created.
+These are used to allow access to each of the items from within the s3 bucket.
+An index.html file is generated and written to the s3 bucket, with a signed URL
+created for this to share with others.
+
 The work to complete this part of the challenge is deployed as part of an AWS
 Lambda function. This function is triggered daily by a CloudWatch Event.
 
