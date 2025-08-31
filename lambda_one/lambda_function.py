@@ -57,7 +57,7 @@ def lambda_one_handler(event, context):
         html_url = generate_signed_url(
             s3_client, bucket_name, index_key, expires_in=86400
         )
-        print(f"{html_url=}")
+        logging.info(f"{html_url=}")
 
     except Exception as e:
         logger.error(f"Unable to list objects in bucket - {e}", exc_info=True)

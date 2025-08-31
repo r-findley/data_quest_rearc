@@ -67,12 +67,4 @@ def human_size(num):
         return f"{num:.0f} PB"
     except Exception as e:
         logging.error(f"Error converting size: {e}")
-    try:
-        for unit in ["B", "KB", "MB", "GB", "TB"]:
-            if num < 1024.0:
-                return f"{num:.0f} {unit}"
-            num /= 1024.0
-        return f"{num:.0f} PB"
-    except Exception as e:
-        logging.error(f"Error converting size: {e}")
         return num
