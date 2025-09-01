@@ -110,6 +110,29 @@ Other resources utilized include:
 - Random module to result in random integers to use in resource names
 - CloudWatch event to trigger the first Lambda function
 
+## Instructions To Deploy
+
+In order to run this application/code, please follow the below.
+
+1. Clone the repository and build a virtual environment using the requirements.txt
+file from either the lambda_one or lambda_two directory.
+2. Log into AWS. This project is set up to use a management account and a sandbox
+account. The account IDs are set up in the [main.tf](./infrastructure/main.tf) file.
+You can switch these to match your accounts.
+3. From the root directory, run the following within a terminal:
+
+```bash
+cd infrastructure
+terraform init
+terraform plan
+terraform apply
+```
+
+Prior to running the ```terraform apply``` command be sure to review the output
+of the ```terraform plan```.
+
+If you want to remove the assets, run the ```terraform destroy``` command.
+
 ## Next Steps
 
 Additional work, design, and structuring of this project is possible. Some ideas
